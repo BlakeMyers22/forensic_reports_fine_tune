@@ -1,0 +1,25 @@
+{
+  "name": "forensic_reports_fine_tune",
+  "version": "1.0.0",
+  "description": "AI-powered forensic report generator with GPT-4o fine-tuning",
+  "main": "index.js",
+  "dependencies": {
+    "openai": "^4.0.0",
+    "axios": "^1.6.2",
+    "mongodb": "^6.3.0",
+    "marked": "^9.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "forensic",
+    "engineering",
+    "reports",
+    "openai",
+    "gpt4",
+    "fine-tuning"
+  ],
+  "author": "",
+  "license": "ISC"
+}
