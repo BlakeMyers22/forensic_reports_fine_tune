@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>North Star Forensic Engineers (NSFE) - Fine-Tuning Enabled</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    
+    <style>
+        .hidden {
+            display: none;
+        }
+        .prose {
+            max-width: 65ch;
+            margin: 0 auto;
+        }
+        .prose h1 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .prose h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .prose p {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .prose ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .section-preview {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        .rating-button.selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+    <body class="bg-gray-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-3xl font-bold text-center mb-8">North Star Forensic Engineers (NSFE)</h1>
+            
+            <!-- Main Form -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <form id="claimForm" class="space-y-6">
+                    <!-- Basic Information -->
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold">Basic Information</h2>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Investigation Date</label>
+                            <input type="date" id="investigationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Client Name</label>
+                            <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Property Type</label>
+                            <select id="propertyType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Property Age (Years)</label>
+                            <input type="number" id="propertyAge" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Construction Type</label>
+                            <input type="text" id="constructionType" placeholder="e.g., Steel frame with brick veneer" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Current Use</label>
+                            <input type="text" id="currentUse" placeholder="e.g., Commercial office space" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Square Footage</label>
+                            <input type="number" id="squareFootage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+                    </div>
+
+                    <!-- Claim Information -->
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold">Claim Information</h2>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Claim Type</label>
+                            <select id="claimType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                <option value="hail">Hail Damage</option>
+                                <option value="wind">Wind Damage</option>
+                                <option value="water">Water Damage</option>
+                                <option value="fire">Fire Damage</option>
+                                <option value="structural">Structural Damage</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Date of Loss (When damage was discovered)</label>
+                            <input type="date" id="dateOfLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Causation Date (When the cause occurred, if different)</label>
+                            <input type="date" id="causationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <p class="text-sm text-gray-500 mt-1">Leave blank if same as Date of Loss</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Property Location</label>
+                            <input type="text" id="location" placeholder="Full address including city, state, and ZIP" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        </div>
+                    </div>
+
+                    <!-- Damage Assessment -->
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold">Damage Assessment</h2>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Affected Areas</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <input type="checkbox" id="roof" class="rounded">
+                                    <label for="roof" class="ml-2">Roof</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="siding" class="rounded">
+                                    <label for="siding" class="ml-2">Siding</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="windows" class="rounded">
+                                    <label for="windows" class="ml-2">Windows</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="gutters" class="rounded">
+                                    <label for="gutters" class="ml-2">Gutters</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="foundation" class="rounded">
+                                    <label for="foundation" class="ml-2">Foundation</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="interior" class="rounded">
+                                    <label for="interior" class="ml-2">Interior</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Engineer Notes</label>
+                            <textarea id="engineerNotes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" 
+                                    placeholder="Enter your engineering observations, measurements, and technical specifications."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                        Begin Report Generation
+                    </button>
+                </form>
+            </div>
+
+            <!-- Section Generation Progress -->
+            <div id="sectionProgress" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Report Generation Progress</h2>
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-authorization"></div>
+                        <span>Authorization and Scope</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-background"></div>
+                        <span>Background Information</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-observations"></div>
+                        <span>Site Observations and Analysis</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-moisture"></div>
+                        <span>Survey</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-meteorologist"></div>
+                        <span>Meteorologist Report</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-conclusions"></div>
+                        <span>Conclusions and Recommendations</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-rebuttal"></div>
+                        <span>Rebuttal</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-limitations"></div>
+                        <span>Limitations</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Section Review -->
+            <div id="sectionReview" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Review Current Section</h2>
+                <div id="currentSectionTitle" class="text-lg font-medium mb-2"></div>
+                <div id="currentSectionContent" class="prose mb-6"></div>
+                
+                <div class="flex space-x-4">
+                    <button id="regenerateSection" class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600">
+                        Regenerate This Section
+                    </button>
+                    <button id="acceptSection" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">
+                        Accept and Continue
+                    </button>
+                    <div class="relative inline-block">
+                        <button id="rateSection" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                            Rate This Section
+                        </button>
+                        <div id="ratingPopup" class="hidden absolute bottom-12 left-0 bg-white p-4 rounded-lg shadow-lg border w-96">
+                            <p class="text-sm text-gray-600 mb-2">Rate this section (1-7):</p>
+                            <div class="flex space-x-2 mb-4">
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="1">1</button>
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="2">2</button>
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="3">3</button>
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="4">4</button>
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="5">5</button>
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="6">6</button>
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="7">7</button>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm text-gray-600 mb-2">Feedback (minimum 10 words):</label>
+                                <textarea 
+                                    id="ratingFeedback" 
+                                    class="w-full p-2 border rounded-md"
+                                    rows="3"
+                                    placeholder="Please provide your feedback on this section..."
+                                ></textarea>
+                                <p id="wordCount" class="text-xs text-gray-500 mt-1">0 words</p>
+                            </div>
+                            <button 
+                                id="submitRating" 
+                                class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                disabled
+                            >
+                                Submit Rating
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="ratingMessage" class="hidden mt-2 text-sm text-green-600">
+                    Rating submitted!
+                </div>
+
+                <!-- Regeneration Dialog -->
+                <div id="regenerationDialog" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                        <h3 class="text-lg font-semibold mb-4">Regenerate Section</h3>
+                        
+                        <p class="text-gray-600 mb-4">
+                            You can provide specific instructions for how you'd like this section regenerated, or leave it blank for a standard regeneration.
+                        </p>
+                        
+                        <textarea 
+                            id="regenerationInstructions" 
+                            rows="4" 
+                            class="w-full p-2 border rounded-md mb-4"
+                            placeholder="Optional: Enter specific instructions for how you'd like this section to be different..."
+                        ></textarea>
+                        
+                        <div class="flex justify-end space-x-4">
+                            <button 
+                                id="cancelRegeneration" 
+                                class="px-4 py-2 text-gray-600 hover:text-gray-800"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                id="confirmRegeneration" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Regenerate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Complete Report Preview -->
+            <div id="reportPreview" class="hidden bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Complete Report</h2>
+                <div id="completeReport" class="prose"></div>
+                <div class="mt-6">
+                    <button id="downloadReport" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                        Download Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-xl">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p class="text-lg font-semibold mt-4" id="loadingText">Generating report section...</p>
+                </div>
+            </div>
+
+            <!-- Model Status Indicator -->
+            <div id="modelStatus" class="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg text-sm">
+                <p>Current Model: <span id="currentModelId" class="font-mono">Loading...</span></p>
+                <p>Last Updated: <span id="lastUpdateTime" class="font-mono">Loading...</span></p>
+            </div>
+        </div>
+
+        <script>
+            // Report sections configuration
+            const reportSections = [
+                { id: 'authorization', title: 'Authorization and Scope of Investigation' },
+                { id: 'background', title: 'Background Information' },
+                { id: 'observations', title: 'Site Observations and Analysis' },
+                { id: 'moisture', title: 'Survey' },
+                { id: 'meteorologist', title: 'Meteorologist Report' },
+                { id: 'conclusions', title: 'Conclusions and Recommendations' },
+                { id: 'rebuttal', title: 'Rebuttal' },
+                { id: 'limitations', title: 'Limitations' }
+            ];
+
+            let currentSectionIndex = 0;
+            let generatedSections = {};
+            let formContext = {};
+
+            // Function to reset rating UI
+            function resetRatingUI() {
+                document.getElementById('ratingFeedback').value = '';
+                document.getElementById('wordCount').textContent = '0 words';
+                document.querySelectorAll('.rating-button').forEach(btn => {
+                    btn.classList.remove('bg-blue-500', 'text-white');
+                });
+                document.getElementById('submitRating').disabled = true;
+                document.getElementById('ratingMessage').classList.add('hidden');
+                document.getElementById('ratingPopup').classList.add('hidden');
+            }
+
+            // Utility function to show/hide loading indicator
+            function toggleLoading(show, message = 'Generating report section...') {
+                const loader = document.getElementById('loadingIndicator');
+                document.getElementById('loadingText').textContent = message;
+                loader.classList.toggle('hidden', !show);
+            }
+
+            // Function to show/hide regeneration dialog
+            function toggleRegenerationDialog(show) {
+                document.getElementById('regenerationDialog').classList.toggle('hidden', !show);
+                if (show) {
+                    document.getElementById('regenerationInstructions').value = '';
+                }
+            }
+
+            // Utility function to get checked items
+            function getCheckedItems(items) {
+                return items.filter(item => document.getElementById(item).checked)
+                           .map(item => document.getElementById(item).nextElementSibling.textContent.trim());
+            }
+
+            // Function to update section progress
+            function updateProgress(sectionId, status) {
+                const progressIndicator = document.getElementById(`progress-${sectionId}`);
+                if (progressIndicator) {
+                    progressIndicator.classList.remove('bg-gray-200', 'bg-green-500', 'bg-red-500');
+                    progressIndicator.classList.add(status === 'complete' ? 'bg-green-500' : status === 'error' ? 'bg-red-500' : 'bg-gray-200');
+                }
+            }
+
+            // Function to check model status
+            async function checkModelStatus() {
+                try {
+                    const response = await fetch('/.netlify/functions/check-model-status');
+                    const data = await response.json();
+                    
+                    document.getElementById('currentModelId').textContent = data.currentModel;
+                    document.getElementById('lastUpdateTime').textContent = new Date(data.lastUpdated).toLocaleString();
+                } catch (error) {
+                    console.error('Error checking model status:', error);
+                }
+            }
+
+            // Check model status every 5 minutes
+            setInterval(checkModelStatus, 5 * 60 * 1000);
+            checkModelStatus(); // Initial check
+
+            // Function to generate a section
+            async function generateSection(sectionId, customInstructions = '') {
+                toggleLoading(true, `Generating ${reportSections.find(s => s.id === sectionId).title}...`);
+                
+                try {
+                    const response = await fetch('/.netlify/functions/generate-report', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            section: sectionId,
+                            context: formContext,
+                            customInstructions: customInstructions
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to generate section');
+                    
+                    const data = await response.json();
+                    updateProgress(sectionId, 'complete');
+                    return data.section;
+                } catch (error) {
+                    console.error('Error:', error);
+                    updateProgress(sectionId, 'error');
+                    throw error;
+                } finally {
+                    toggleLoading(false);
+                }
+            }
+
+            // Function to update section preview
+            function updateSectionPreview(sectionId, content) {
+                document.getElementById('currentSectionTitle').textContent = 
+                    reportSections.find(s => s.id === sectionId).title;
+                document.getElementById('currentSectionContent').innerHTML = marked.parse(content);
+                document.getElementById('sectionReview').classList.remove('hidden');
+            }
+
+            // Function to compile final report
+            function compileFinalReport() {
+                const reportContent = reportSections
+                    .map(section => {
+                        const content = generatedSections[section.id];
+                        return content ? `# ${section.title}\n\n${content}\n\n` : '';
+                    })
+                    .join('');
+
+                document.getElementById('completeReport').innerHTML = marked.parse(reportContent);
+                document.getElementById('sectionReview').classList.add('hidden');
+                document.getElementById('reportPreview').classList.remove('hidden');
+            }
+
+            // Form submission handler
+            document.getElementById('claimForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                formContext = {
+                    investigationDate: document.getElementById('investigationDate').value,
+                    clientName: document.getElementById('clientName').value,
+                    propertyType: document.getElementById('propertyType').value,
+                    propertyAge: document.getElementById('propertyAge').value,
+                    constructionType: document.getElementById('constructionType').value,
+                    currentUse: document.getElementById('currentUse').value,
+                    squareFootage: document.getElementById('squareFootage').value,
+                    claimType: document.getElementById('claimType').value,
+                    dateOfLoss: document.getElementById('dateOfLoss').value,
+                    causationDate: document.getElementById('causationDate').value || document.getElementById('dateOfLoss').value,
+                    location: document.getElementById('location').value,
+                    affectedAreas: getCheckedItems(['roof', 'siding', 'windows', 'gutters', 'foundation', 'interior']),
+                    engineerNotes: document.getElementById('engineerNotes').value
+                };
+
+                document.getElementById('claimForm').parentElement.classList.add('hidden');
+                document.getElementById('sectionProgress').classList.remove('hidden');
+                
+                try {
+                    const content = await generateSection(reportSections[0].id);
+                    generatedSections[reportSections[0].id] = content;
+                    updateSectionPreview(reportSections[0].id, content);
+                } catch (error) {
+                    alert('Failed to generate initial section. Please try again.');
+                }
+            });
+
+            // Word count handler
+            document.getElementById('ratingFeedback').addEventListener('input', (e) => {
+                const words = e.target.value.trim().split(/\s+/).filter(word => word.length > 0);
+                const wordCount = words.length;
+                document.getElementById('wordCount').textContent = `${wordCount} words`;
+                
+                const submitButton = document.getElementById('submitRating');
+                const hasRating = document.querySelector('.rating-button.bg-blue-500') !== null;
+                submitButton.disabled = !(wordCount >= 10 && hasRating);
+            });
+
+            // Rating button handlers
+            document.getElementById('rateSection').addEventListener('click', () => {
+                document.getElementById('ratingPopup').classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('.rating-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.rating-button').forEach(btn => {
+                        btn.classList.remove('bg-blue-500', 'text-white');
+                    });
+                    button.classList.add('bg-blue-500', 'text-white');
+                    
+                    const wordCount = document.getElementById('ratingFeedback').value.trim().split(/\s+/).filter(word => word.length > 0).length;
+                    document.getElementById('submitRating').disabled = wordCount < 10;
+                });
+            });
+
+            // Submit rating handler
+            document.getElementById('submitRating').addEventListener('click', async () => {
+                const rating = document.querySelector('.rating-button.bg-blue-500').dataset.rating;
+                const feedback = document.getElementById('ratingFeedback').value;
+                const currentSection = reportSections[currentSectionIndex];
+                
+                try {
+                    const response = await fetch('/.netlify/functions/store-rating', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sectionId: currentSection.id,
+                            rating: parseInt(rating),
+                            feedback,
+                            generatedContent: generatedSections[currentSection.id],
+                            originalPrompt: formContext,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to store rating');
+                    
+                    document.getElementById('ratingMessage').textContent = `Rating of ${rating}/7 submitted!`;
+                    document.getElementById('ratingMessage').classList.remove('hidden');
+                    document.getElementById('ratingPopup').classList.add('hidden');
+
+                    const data = await response.json();
+                    if (data.triggered_fine_tuning) {
+                        setTimeout(checkModelStatus, 5000); // Check model status after 5 seconds
+                    }
+                } catch (error) {
+                    console.error('Error storing rating:', error);
+                    alert('Failed to submit rating. Please try again.');
+                }
+            });
+
+            // Handle rating popup close
+            document.addEventListener('click', (e) => {
+                const popup = document.getElementById('ratingPopup');
+                const rateButton = document.getElementById('rateSection');
+                
+                if (!popup.contains(e.target) && !rateButton.contains(e.target)) {
+                    popup.classList.add('hidden');
+                }
+            });
+
+            // Regeneration dialog handlers
+            document.getElementById('regenerateSection').addEventListener('click', () => {
+                toggleRegenerationDialog(true);
+            });
+
+            document.getElementById('cancelRegeneration').addEventListener('click', () => {
+                toggleRegenerationDialog(false);
+            });
+
+            document.getElementById('confirmRegeneration').addEventListener('click', async () => {
+                const instructions = document.getElementById('regenerationInstructions').value.trim();
+                toggleRegenerationDialog(false);
+                
+                try {
+                    const currentSection = reportSections[currentSectionIndex];
+                    const content = await generateSection(currentSection.id, instructions);
+                    generatedSections[currentSection.id] = content;
+                    updateSectionPreview(currentSection.id, content);
+                } catch (error) {
+                    alert('Failed to regenerate section. Please try again.');
+                }
+            });
+
+            // Accept section handler with rating reset
+            document.getElementById('acceptSection').addEventListener('click', async () => {
+                resetRatingUI();
+                currentSectionIndex++;
+                
+                if (currentSectionIndex >= reportSections.length) {
+                    compileFinalReport();
+                    return;
+                }
+
+                try {
+                    const nextSection = reportSections[currentSectionIndex];
+                    const content = await generateSection(nextSection.id);
+                    generatedSections[nextSection.id] = content;
+                    updateSectionPreview(nextSection.id, content);
+                } catch (error) {
+                    alert('Failed to generate next section. Please try again.');
+                    currentSectionIndex--;
+                }
+            });
+
+            // Download report handler
+            document.getElementById('downloadReport').addEventListener('click', () => {
+                const reportContent = document.getElementById('completeReport').innerHTML;
+                const blob = new Blob([reportContent], { type: 'text/html' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `forensic-report-${formContext.location.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.html`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            });
+
+            // Escape key handler
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    toggleRegenerationDialog(false);
+                    document.getElementById('ratingPopup').classList.add('hidden');
+                }
+            });
+        </script>
+    </body>
+</html>
