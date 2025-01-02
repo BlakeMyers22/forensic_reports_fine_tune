@@ -90,46 +90,60 @@ exports.handler = async function(event, context) {
             if (highQualityCount >= 10) {
                 console.log('Triggering fine-tuning process');
                 try {
-                    const finetuneResponse = await fetch('/.netlify/functions/fine-tune-model', {
+                    const finetuneResponse = await fetch(`${process.env.URL}/.netlify/functions/fine-tune-model`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ trigger: 'new_high_quality_examples' })
                     });
                     
+                    const finetuneResult = await finetuneResponse.json();
+                    
                     if (!finetuneResponse.ok) {
-                        console.error('Fine-tuning trigger failed:', await finetuneResponse.text());
+                        console.error('Fine-tuning trigger failed:', finetuneResult);
                     } else {
                         triggered_fine_tuning = true;
+                        console.log('Fine-tuning triggered successfully:', finetuneResult);
                     }
                 } catch (finetuneError) {
                     console.error('Error triggering fine-tuning:', finetuneError);
+                    // Continue execution even if fine-tuning fails
+                }
+            }
+
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ 
+                    message: 'Rating stored successfully',
+                    ratingId: result.insertedId.toString(),
+                    triggered_fine_tuning,
+                    highQualityCount
+                })
+            };
+
+        } catch (error) {
+            console.error('Error in store-rating handler:', {
+                message: error.message,
+                stack: error.stack,
+                mongoState: client?.topology?.state
+            });
+            
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ 
+                    error: 'Failed to store rating',
+                    details: error.message,
+                    mongoState: client?.topology?.state
+                })
+            };
+        } finally {
+            if (client) {
+                try {
+                    await client.close();
+                } catch (closeError) {
+                    console.error('Error closing MongoDB connection:', closeError);
                 }
             }
         }
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ 
-                message: 'Rating stored successfully',
-                ratingId: result.insertedId,
-                triggered_fine_tuning
-            })
-        };
-
-    } catch (error) {
-        console.error('Error in store-rating handler:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ 
-                error: 'Failed to store rating',
-                details: error.message 
-            })
-        };
-    } finally {
-        if (client) {
-            await client.close();
-        }
-    }
 };
