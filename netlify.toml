@@ -7,7 +7,7 @@
   status = 200
 
 [functions]
-  external_node_modules = ["mongodb", "openai", "axios", "marked"]
+  external_node_modules = ["mongodb", "openai", "axios", "marked", "node-fetch"]
 
 [[headers]]
   for = "/*"
