@@ -1,16 +1,13 @@
-import fetch from 'node-fetch';
-
 const { MongoClient } = require('mongodb');
+const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
-    // Enable CORS
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
 
-    // Handle preflight requests
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
@@ -19,36 +16,37 @@ exports.handler = async function(event, context) {
         };
     }
 
-    // Check method
     if (event.httpMethod !== 'POST') {
-        return { 
-            statusCode: 405, 
+        return {
+            statusCode: 405,
             headers,
-            body: JSON.stringify({ error: 'Method Not Allowed' }) 
+            body: JSON.stringify({ error: 'Method Not Allowed' })
         };
     }
 
     let client;
     try {
-        // Parse and validate input
         console.log('Incoming request body:', event.body);
         const ratingData = JSON.parse(event.body);
         console.log('Parsed rating data:', ratingData);
-        
-        // Validate required fields
+
         if (!ratingData.sectionId || !ratingData.rating || !ratingData.feedback) {
             throw new Error('Missing required fields: sectionId, rating, and feedback are required');
         }
 
-        // Connect to MongoDB
-        client = new MongoClient(process.env.MONGODB_URI);
+        client = new MongoClient(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000
+        });
+
         await client.connect();
-        
+        console.log('MongoDB connected successfully');
+
         const db = client.db('forensic-reports');
         const ratingsCollection = db.collection('ratings');
         const highQualityCollection = db.collection('high-quality-examples');
-        
-        // Format the data for storage
+
         const trainingExample = {
             sectionId: ratingData.sectionId,
             rating: parseInt(ratingData.rating),
@@ -74,21 +72,18 @@ exports.handler = async function(event, context) {
             }
         };
 
-        // Store rating
         const result = await ratingsCollection.insertOne(trainingExample);
         console.log('Rating stored with ID:', result.insertedId);
 
-        // Handle high-quality examples
         let triggered_fine_tuning = false;
         if (ratingData.rating >= 6) {
             await highQualityCollection.insertOne(trainingExample);
             console.log('High-quality example stored');
-            
-            // Check for fine-tuning trigger
+
             const highQualityCount = await highQualityCollection.countDocuments({
                 timestamp: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
             });
-            
+
             if (highQualityCount >= 10) {
                 console.log('Triggering fine-tuning process');
                 try {
@@ -97,9 +92,9 @@ exports.handler = async function(event, context) {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ trigger: 'new_high_quality_examples' })
                     });
-                    
+
                     const finetuneResult = await finetuneResponse.json();
-                    
+
                     if (!finetuneResponse.ok) {
                         console.error('Fine-tuning trigger failed:', finetuneResult);
                     } else {
@@ -108,44 +103,45 @@ exports.handler = async function(event, context) {
                     }
                 } catch (finetuneError) {
                     console.error('Error triggering fine-tuning:', finetuneError);
-                    // Continue execution even if fine-tuning fails
-                }
-            }
-
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify({ 
-                    message: 'Rating stored successfully',
-                    ratingId: result.insertedId.toString(),
-                    triggered_fine_tuning,
-                    highQualityCount
-                })
-            };
-
-        } catch (error) {
-            console.error('Error in store-rating handler:', {
-                message: error.message,
-                stack: error.stack,
-                mongoState: client?.topology?.state
-            });
-            
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ 
-                    error: 'Failed to store rating',
-                    details: error.message,
-                    mongoState: client?.topology?.state
-                })
-            };
-        } finally {
-            if (client) {
-                try {
-                    await client.close();
-                } catch (closeError) {
-                    console.error('Error closing MongoDB connection:', closeError);
                 }
             }
         }
+
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                message: 'Rating stored successfully',
+                ratingId: result.insertedId.toString(),
+                triggered_fine_tuning,
+                highQualityCount: highQualityCount || 0
+            })
+        };
+
+    } catch (error) {
+        console.error('Detailed error in store-rating:', {
+            message: error.message,
+            stack: error.stack,
+            mongoState: client?.topology?.state
+        });
+
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({
+                error: 'Failed to store rating',
+                details: error.message || 'Unknown error occurred',
+                mongoState: client?.topology?.state
+            })
+        };
+    } finally {
+        if (client) {
+            try {
+                await client.close();
+                console.log('MongoDB connection closed');
+            } catch (closeError) {
+                console.error('Error closing MongoDB connection:', closeError);
+            }
+        }
+    }
 };
