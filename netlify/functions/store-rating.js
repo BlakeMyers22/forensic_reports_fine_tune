@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 const { MongoClient } = require('mongodb');
 
 exports.handler = async function(event, context) {
