@@ -29,7 +29,9 @@ exports.handler = async function(event, context) {
     let client;
     try {
         // Parse and validate input
+        console.log('Incoming request body:', event.body);
         const ratingData = JSON.parse(event.body);
+        console.log('Parsed rating data:', ratingData);
         
         // Validate required fields
         if (!ratingData.sectionId || !ratingData.rating || !ratingData.feedback) {
