@@ -522,21 +522,25 @@
                 });
             });
 
-            // Submit rating handler
             document.getElementById('submitRating').addEventListener('click', async () => {
-                const rating = document.querySelector('.rating-button.bg-blue-500').dataset.rating;
+                const ratingButton = document.querySelector('.rating-button.bg-blue-500');
+                if (!ratingButton) {
+                    alert('Please select a rating');
+                    return;
+                }
+                
+                const rating = ratingButton.dataset.rating;
                 const feedback = document.getElementById('ratingFeedback').value;
                 const currentSection = reportSections[currentSectionIndex];
                 
-                // Add this debug log
-                console.log('Preparing to submit rating:', {
+                console.log('Submitting rating with data:', {
                     sectionId: currentSection.id,
-                    rating: parseInt(rating),
+                    rating,
                     feedback,
                     generatedContent: generatedSections[currentSection.id],
                     originalPrompt: formContext
                 });
-                
+            
                 try {
                     const response = await fetch('/.netlify/functions/store-rating', {
                         method: 'POST',
@@ -551,13 +555,12 @@
                         })
                     });
             
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error('Rating submission failed:', errorData);
-                        throw new Error(`Failed to store rating: ${errorData.details || errorData.error}`);
-                    }
-                    
                     const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.details || data.error || 'Failed to store rating');
+                    }
+            
                     document.getElementById('ratingMessage').textContent = `Rating of ${rating}/7 submitted!`;
                     document.getElementById('ratingMessage').classList.remove('hidden');
                     document.getElementById('ratingPopup').classList.add('hidden');
@@ -566,7 +569,7 @@
                         setTimeout(checkModelStatus, 5000);
                     }
                 } catch (error) {
-                    console.error('Error storing rating:', error);
+                    console.error('Error details:', error);
                     alert(`Failed to submit rating: ${error.message}`);
                 }
             });
