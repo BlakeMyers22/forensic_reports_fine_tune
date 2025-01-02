@@ -392,13 +392,18 @@
             // Function to check model status
             async function checkModelStatus() {
                 try {
-                    const response = await fetch('/.netlify/functions/check-model-status');
-                    const data = await response.json();
-                    
-                    document.getElementById('currentModelId').textContent = data.currentModel;
-                    document.getElementById('lastUpdateTime').textContent = new Date(data.lastUpdated).toLocaleString();
+                    const modelStatus = await fetch('/.netlify/functions/check-model-status');
+                    if (!modelStatus.ok) {
+                        throw new Error('Failed to fetch model status');
+                    }
+                    const data = await modelStatus.json();
+                    document.getElementById('currentModelId').textContent = data.currentModel || 'Default Model';
+                    document.getElementById('lastUpdateTime').textContent = data.lastUpdated ? 
+                        new Date(data.lastUpdated).toLocaleString() : 'Not updated';
                 } catch (error) {
                     console.error('Error checking model status:', error);
+                    document.getElementById('currentModelId').textContent = 'Error checking status';
+                    document.getElementById('lastUpdateTime').textContent = 'Unknown';
                 }
             }
 
