@@ -46,7 +46,7 @@ exports.handler = async function(event, context) {
         // Create fine-tuning job
         console.log('Creating fine-tuning job...');
         const fineTuningJob = await openai.fineTuning.jobs.create({
-            model: "gpt-4o-mini",
+            model: "gpt-3",
             training_data: trainingData,
             hyperparameters: {
                 n_epochs: 3
