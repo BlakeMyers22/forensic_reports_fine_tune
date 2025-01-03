@@ -54,7 +54,7 @@ async function getLatestModelId() {
         await client.connect();
         const configCollection = client.db('forensic-reports').collection('config');
         const config = await configCollection.findOne({ key: 'latest_model' });
-        return config?.modelId || 'gpt-4o-2024-08-06';  // Fallback to base model
+        return config?.modelId || 'gpt-3';  // Fallback to base model
     } catch (error) {
         console.error('Error fetching latest model ID:', error);
         return 'gpt-4o-2024-08-06'; // Fallback to base model
