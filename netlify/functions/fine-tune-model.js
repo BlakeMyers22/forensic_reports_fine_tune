@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 const OpenAI = require('openai');
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEYt
 });
 
 exports.handler = async function(event, context) {
