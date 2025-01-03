@@ -99,7 +99,7 @@ exports.handler = async function(event, context) {
             if (highQualityCount >= 10) {
                 console.log('Triggering fine-tuning process');
                 try {
-                    const finetuneResponse = await fetch(`${process.env.URL}/.netlify/functions/fine-tune-model`, {
+                    const finetuneResponse = await fetch(`/.netlify/functions/fine-tune-model`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ trigger: 'new_high_quality_examples' })
